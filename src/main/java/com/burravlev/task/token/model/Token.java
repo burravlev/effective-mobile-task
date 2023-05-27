@@ -1,4 +1,4 @@
-package com.burravlev.task.token.mode;
+package com.burravlev.task.token.model;
 
 import com.burravlev.task.user.model.UserModel;
 import lombok.*;

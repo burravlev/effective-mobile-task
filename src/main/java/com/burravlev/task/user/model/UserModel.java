@@ -1,6 +1,6 @@
 package com.burravlev.task.user.model;
 
-import com.burravlev.task.token.mode.Token;
+import com.burravlev.task.token.model.Token;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,7 +36,7 @@ public class UserModel implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return role.getAuthorities();
     }
 
     @Override

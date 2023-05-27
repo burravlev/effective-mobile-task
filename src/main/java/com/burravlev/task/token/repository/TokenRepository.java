@@ -1,6 +1,6 @@
 package com.burravlev.task.token.repository;
 
-import com.burravlev.task.token.mode.Token;
+import com.burravlev.task.token.model.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

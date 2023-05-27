@@ -1,10 +1,12 @@
 package com.burravlev.task.user.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserDto {
     private Long id;
     private String username;

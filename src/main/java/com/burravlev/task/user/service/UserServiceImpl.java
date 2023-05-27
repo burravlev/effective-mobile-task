@@ -1,6 +1,8 @@
 package com.burravlev.task.user.service;
 
+import com.burravlev.task.user.exception.EmailIsAlreadyTakenException;
 import com.burravlev.task.user.exception.UserNotFoundException;
+import com.burravlev.task.user.exception.UsernameIsAlreadyTakenException;
 import com.burravlev.task.user.model.UserModel;
 import com.burravlev.task.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,5 +19,24 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    @Override
+    public UserModel findByUsername(String username) {
+        return repository.findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
+    }
 
+    @Override
+    public UserModel save(UserModel user) {
+        if (repository.existsByEmail(user.getEmail()))
+            throw new EmailIsAlreadyTakenException("This email already registered");
+        if (repository.existsByUsername(user.getUsername()))
+            throw new UsernameIsAlreadyTakenException("Username id already taken");
+        return repository.save(user);
+    }
+
+    @Override
+    public UserModel findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(UserNotFoundException::new);
+    }
 }
