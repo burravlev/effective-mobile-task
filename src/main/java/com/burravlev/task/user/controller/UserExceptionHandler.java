@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class UserExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorDto> handleUserNotFoundException(UserNotFoundException e) {
-        return new ResponseEntity<>(new ErrorDto(e.getMessage()), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ErrorDto("User doesn't exists"), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UsernameIsAlreadyTakenException.class)

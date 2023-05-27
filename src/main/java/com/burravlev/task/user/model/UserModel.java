@@ -21,13 +21,19 @@ public class UserModel implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "username", unique = true, nullable = false)
-    private String username;
+    //Stateful username used for authentication and principal
+    @Column(name = "uuid", unique = true, nullable = false)
+    private String uuid;
+    //Public username used for credentials
+    @Column(name = "public_username", unique = true, nullable = false)
+    private String publicUsername;
     @Email
     @Column(name = "email", unique = true, nullable = false)
     private String email;
     @Column(name = "password", nullable = false)
     private String password;
+    private String firstName;
+    private String lastName;
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
@@ -42,6 +48,11 @@ public class UserModel implements UserDetails {
     @Override
     public boolean isAccountNonExpired() {
         return true;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.uuid;
     }
 
     @Override
