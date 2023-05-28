@@ -13,4 +13,9 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorDto> handleDataIntegrityViolationException(DuplicateKeyException e) {
         return new ResponseEntity<>(new ErrorDto(e.getMessage()), HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorDto> handleIllegalArgumentException(IllegalArgumentException e) {
+        return new ResponseEntity<>(new ErrorDto(e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
 }

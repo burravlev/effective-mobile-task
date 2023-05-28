@@ -1,4 +1,4 @@
-package com.burravlev.task.user.model;
+package com.burravlev.task.user.domain.model;
 
 import com.burravlev.task.token.model.Token;
 import lombok.*;
@@ -21,9 +21,6 @@ public class UserModel implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    //Stateful username used for authentication and principal
-    @Column(name = "uuid", unique = true, nullable = false)
-    private String uuid;
     //Public username used for credentials
     @Column(name = "public_username", unique = true, nullable = false)
     private String publicUsername;
@@ -50,9 +47,10 @@ public class UserModel implements UserDetails {
         return true;
     }
 
+    //Returns JWT subject
     @Override
     public String getUsername() {
-        return this.uuid;
+        return id.toString();
     }
 
     @Override

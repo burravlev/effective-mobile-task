@@ -10,6 +10,7 @@ import lombok.*;
 @Setter
 public class AuthenticationRequest {
     private String username;
+    private String email;
     //think about access level
     private String password;
 }

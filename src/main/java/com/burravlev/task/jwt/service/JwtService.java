@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.function.Function;
 
-@Service
 public interface JwtService {
 
     String extractUsername(String token);

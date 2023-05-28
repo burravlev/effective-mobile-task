@@ -1,6 +1,6 @@
 package com.burravlev.task.token.model;
 
-import com.burravlev.task.user.model.UserModel;
+import com.burravlev.task.user.domain.model.UserModel;
 import lombok.*;
 
 import javax.persistence.*;

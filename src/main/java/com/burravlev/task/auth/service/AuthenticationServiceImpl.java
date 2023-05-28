@@ -3,11 +3,12 @@ package com.burravlev.task.auth.service;
 import com.burravlev.task.auth.dto.AuthenticationRequest;
 import com.burravlev.task.auth.dto.AuthenticationResponse;
 import com.burravlev.task.auth.dto.RegistrationRequest;
+import com.burravlev.task.auth.exception.WrongCredentialsException;
 import com.burravlev.task.jwt.service.JwtService;
 import com.burravlev.task.token.model.Token;
 import com.burravlev.task.token.model.TokenType;
 import com.burravlev.task.token.service.TokenService;
-import com.burravlev.task.user.model.UserModel;
+import com.burravlev.task.user.domain.model.UserModel;
 import com.burravlev.task.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public AuthenticationResponse register(RegistrationRequest request) {
         UserModel user = UserModel.builder()
-                .uuid(request.getUsername())
+                .publicUsername(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
@@ -50,14 +51,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        System.out.println("Method authenticate: " + request.getUsername());
+        final UserModel user;
+
+        if (request.getUsername() != null)
+            user = userService.findByUsername(request.getUsername());
+        else if (request.getEmail() != null)
+            user = userService.findByEmail(request.getEmail());
+        else throw new WrongCredentialsException("User doesn't exists");
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
+                        user.getUsername(),
                         request.getPassword()
                 )
         );
-        UserModel user = userService.findByUsername(request.getUsername());
+
         String jwtToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);

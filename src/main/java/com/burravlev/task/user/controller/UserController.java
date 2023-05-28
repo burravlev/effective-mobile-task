@@ -1,11 +1,18 @@
 package com.burravlev.task.user.controller;
 
 import com.burravlev.task.api.dto.ErrorDto;
-import com.burravlev.task.user.dto.UpdateRequest;
-import com.burravlev.task.user.dto.UserDto;
-import com.burravlev.task.user.model.UserModel;
+import com.burravlev.task.user.domain.dto.PasswordUpdateRequest;
+import com.burravlev.task.user.domain.dto.UpdateRequest;
+import com.burravlev.task.user.domain.dto.UserDto;
+import com.burravlev.task.user.domain.model.UserModel;
 import com.burravlev.task.user.service.UserService;
 import com.burravlev.task.util.mapper.Mapper;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +26,36 @@ public class UserController {
     private final UserService userService;
     private final Mapper<UserModel, UserDto> mapper;
 
-    @GetMapping("/{username}")
-    public ResponseEntity<UserDto> get(@PathVariable("username") String username) {
-        UserDto user = mapper.map(userService.findByUsername(username));
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get user by id",
+                    content = @Content(schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class))),
+            @ApiResponse(responseCode = "403", description = "Not authenticated",
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class))),
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDto> get(@PathVariable("id") Long id) {
+        UserDto user = mapper.map(userService.findById(id));
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PutMapping("/{username}")
-    public ResponseEntity<?> update(@PathVariable("username") String username,
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable("id") Long id,
                                     Authentication authentication,
                                     @RequestBody UpdateRequest request) {
-        if (!username.equals(authentication.getName()))
+        if (!id.toString().equals(authentication.getName()))
             return new ResponseEntity<>(new ErrorDto("No access to update this user"), HttpStatus.FORBIDDEN);
-        userService.update(username, request);
+        UserModel user = userService.update(id, request);
+        return new ResponseEntity<>(mapper.map(user), HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}/password")
+    public ResponseEntity<?> updatePassword(@PathVariable("id") Long id, @RequestBody PasswordUpdateRequest request) {
+        userService.updatePassword(id, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
 }

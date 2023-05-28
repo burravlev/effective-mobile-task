@@ -1,4 +1,4 @@
-package com.burravlev.task.user.dto;
+package com.burravlev.task.user.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

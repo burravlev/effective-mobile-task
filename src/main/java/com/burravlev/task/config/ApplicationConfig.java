@@ -18,7 +18,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return userService::findByUsername;
+        return userService::findBySub;
     }
 
     @Bean
