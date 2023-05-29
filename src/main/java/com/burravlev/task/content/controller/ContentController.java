@@ -1,13 +1,11 @@
 package com.burravlev.task.content.controller;
 
-import com.burravlev.task.content.domail.dto.UploadResponse;
+import com.burravlev.task.content.domain.dto.ImageDto;
+import com.burravlev.task.content.domain.model.Image;
 import com.burravlev.task.content.exception.UnsupportedContentType;
 import com.burravlev.task.content.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,21 +16,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class ContentController {
     private final FileStorageService fileStorageService;
 
-    @GetMapping("/{image}")
-    public ResponseEntity<Resource> get(@PathVariable("image") String imageName) {
-        ByteArrayResource resource = fileStorageService.get(imageName);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentLength(resource.contentLength())
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(resource);
-    }
-
     @PostMapping("/upload")
-    public ResponseEntity<UploadResponse> upload(MultipartFile file) {
+    public ResponseEntity<ImageDto> upload(@RequestParam("file") MultipartFile file) {
         if (!"image/jpeg".equals(file.getContentType())) {
             throw new UnsupportedContentType("Only image/jpeg");
         }
-        return new ResponseEntity<>(new UploadResponse(), HttpStatus.OK);
+        Image image = fileStorageService.save(file);
+        return new ResponseEntity<>(ImageDto.builder()
+                .id(image.getId())
+                .url(image.getUrl())
+                .build(), HttpStatus.OK);
     }
 }

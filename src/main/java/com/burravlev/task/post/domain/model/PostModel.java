@@ -1,6 +1,6 @@
 package com.burravlev.task.post.domain.model;
 
-import com.burravlev.task.content.domail.model.Image;
+import com.burravlev.task.content.domain.model.Image;
 import com.burravlev.task.user.domain.model.UserModel;
 import lombok.Getter;
 import lombok.Setter;

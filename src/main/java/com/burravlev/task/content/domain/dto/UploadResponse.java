@@ -1,4 +1,4 @@
-package com.burravlev.task.content.domail.dto;
+package com.burravlev.task.content.domain.dto;
 
 import lombok.*;
 

@@ -1,6 +1,6 @@
 package com.burravlev.task.content.service;
 
-import com.burravlev.task.content.domail.model.Image;
+import com.burravlev.task.content.domain.model.Image;
 import com.burravlev.task.content.exception.FileProcessingException;
 import com.burravlev.task.content.repository.ImageRepository;
 import com.burravlev.task.content.util.FileNameGenerator;
@@ -21,7 +21,7 @@ import java.nio.file.Paths;
 public class FileStorageServiceImpl implements FileStorageService {
     private final ImageRepository repository;
 
-    @Value("{application.files.dir}")
+    @Value("${application.files.dir}")
     private String outputDir;
 
     @Override
@@ -32,7 +32,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         try {
             multipartFile.transferTo(file);
             return Image.builder()
-                    .url("/api/v1/images/" + file.getName())
+                    .url("/api/v1/img/" + file.getName())
                     .filename(file.getName())
                     .build();
         }  catch (IOException e) {

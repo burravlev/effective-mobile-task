@@ -1,4 +1,4 @@
-package com.burravlev.task.content.domail.model;
+package com.burravlev.task.content.domain.model;
 
 import lombok.*;
 
