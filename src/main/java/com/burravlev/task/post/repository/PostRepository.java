@@ -1,6 +1,6 @@
 package com.burravlev.task.post.repository;
 
-import com.burravlev.task.post.domain.model.PostModel;
+import com.burravlev.task.post.domain.entity.PostModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

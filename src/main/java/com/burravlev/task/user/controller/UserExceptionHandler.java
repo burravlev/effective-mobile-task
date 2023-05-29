@@ -3,7 +3,7 @@ package com.burravlev.task.user.controller;
 import com.burravlev.task.api.dto.ErrorDto;
 import com.burravlev.task.auth.exception.WrongCredentialsException;
 import com.burravlev.task.user.exception.EmailIsAlreadyTakenException;
-import com.burravlev.task.user.exception.IllegalFriendshipException;
+import com.burravlev.task.friendship.exception.IllegalFriendshipException;
 import com.burravlev.task.user.exception.UserNotFoundException;
 import com.burravlev.task.user.exception.UsernameIsAlreadyTakenException;
 import org.springframework.http.HttpStatus;

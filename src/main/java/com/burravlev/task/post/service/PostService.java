@@ -1,6 +1,6 @@
 package com.burravlev.task.post.service;
 
-import com.burravlev.task.post.domain.model.PostModel;
+import com.burravlev.task.post.domain.entity.PostModel;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
