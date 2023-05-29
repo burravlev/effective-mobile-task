@@ -24,4 +24,6 @@ public interface FriendshipService {
     Friendship deleteFriend(Long userId, Long userToDeleteId);
 
     Friendship unsubscribe(Long userId, Long unsubscribeFromId);
+
+    List<Long> getAllFollowedUsers(Long id);
 }

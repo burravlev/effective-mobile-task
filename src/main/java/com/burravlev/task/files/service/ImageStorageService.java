@@ -14,4 +14,6 @@ public interface ImageStorageService {
     Image getById(Long id);
 
     ByteArrayResource getResource(String name);
+
+    List<Image> findAll(List<Long> ids);
 }

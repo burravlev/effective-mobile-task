@@ -108,4 +108,14 @@ public class FriendshipServiceImpl implements FriendshipService {
         repository.delete(friendship);
         return friendship;
     }
+
+    @Override
+    public List<Long> getAllFollowedUsers(Long id) {
+        return repository.findAllFollowedUsers(id)
+                .stream().map(f -> {
+                    if (f.getAddressee().getId().equals(id))
+                        return f.getRequester().getId();
+                    else return f.getAddressee().getId();
+                }).collect(Collectors.toList());
+    }
 }

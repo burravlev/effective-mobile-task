@@ -2,8 +2,7 @@ package com.burravlev.task.post.domain.entity;
 
 import com.burravlev.task.files.domain.entity.Image;
 import com.burravlev.task.user.domain.model.UserModel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -14,6 +13,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class PostModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +24,7 @@ public class PostModel {
     private UserModel creator;
     private String header;
     private String message;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "post_content",
             joinColumns = @JoinColumn(name = "image_id"),

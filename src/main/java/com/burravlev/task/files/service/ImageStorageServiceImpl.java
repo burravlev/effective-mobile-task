@@ -72,4 +72,9 @@ public class ImageStorageServiceImpl implements ImageStorageService {
             throw new FileProcessingException("Internal server error while processing image");
         }
     }
+
+    @Override
+    public List<Image> findAll(List<Long> ids) {
+        return repository.findAll(ids);
+    }
 }
