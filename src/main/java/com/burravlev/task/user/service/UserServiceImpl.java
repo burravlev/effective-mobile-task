@@ -2,7 +2,7 @@ package com.burravlev.task.user.service;
 
 import com.burravlev.task.auth.exception.WrongCredentialsException;
 import com.burravlev.task.user.domain.dto.PasswordUpdateRequest;
-import com.burravlev.task.user.domain.dto.UpdateRequest;
+import com.burravlev.task.user.domain.dto.UserInfoUpdateRequest;
 import com.burravlev.task.user.exception.EmailIsAlreadyTakenException;
 import com.burravlev.task.user.exception.UserNotFoundException;
 import com.burravlev.task.user.exception.UsernameIsAlreadyTakenException;
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModel update(Long id, UpdateRequest request) {
+    public UserModel update(Long id, UserInfoUpdateRequest request) {
         UserModel user = this.findById(id);
         if (request.getUsername() != null)
             user.setPublicUsername(request.getUsername());

@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErrorDto {
-    @Schema(name = "error", description = "Contains error message", example = "Entity not found")
-    private String error;
+public class SuccessDto {
+    @Schema(name = "message", description = "Successful request message", example = "User created")
+    private String message;
 }

@@ -1,7 +1,7 @@
 package com.burravlev.task.user.service;
 
 import com.burravlev.task.user.domain.dto.PasswordUpdateRequest;
-import com.burravlev.task.user.domain.dto.UpdateRequest;
+import com.burravlev.task.user.domain.dto.UserInfoUpdateRequest;
 import com.burravlev.task.user.domain.model.UserModel;
 
 public interface UserService {
@@ -15,7 +15,7 @@ public interface UserService {
 
     UserModel save(UserModel user);
 
-    UserModel update(Long id, UpdateRequest request);
+    UserModel update(Long id, UserInfoUpdateRequest request);
 
     UserModel updatePassword(Long id, PasswordUpdateRequest request);
 }

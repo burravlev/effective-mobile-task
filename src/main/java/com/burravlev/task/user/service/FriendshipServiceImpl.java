@@ -1,5 +1,6 @@
 package com.burravlev.task.user.service;
 
+import com.burravlev.task.user.domain.dto.FriendshipRequest;
 import com.burravlev.task.user.domain.model.Friendship;
 import com.burravlev.task.user.domain.model.UserModel;
 import com.burravlev.task.user.exception.IllegalFriendshipException;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,13 +24,24 @@ public class FriendshipServiceImpl implements FriendshipService {
 
     @Override
     @Transactional
-    public Friendship newRequest(Long requester, Long addressee) {
-        if (repository.find(requester, addressee).isPresent())
-            throw new IllegalFriendshipException("Relationship already exists");
-        return repository.save(Friendship.builder()
-                .requester(userService.findById(requester))
-                .addressee(userService.findById(addressee))
-                .build());
+    public Friendship createOrApprove(Long userId, FriendshipRequest request) {
+        Optional<Friendship> optional = repository.find(userId, request.getUserId());
+        if (userId.equals(request.getUserId()))
+            throw new IllegalFriendshipException("User can't send friendship request to himself");
+        if (!optional.isPresent()) {
+            return repository.save(Friendship.builder()
+                    .requester(userService.findById(userId))
+                    .addressee(userService.findById(request.getUserId()))
+                    .status(Friendship.FriendshipStatus.REQUEST)
+                    .build());
+        }
+        Friendship friendship = optional.get();
+        if (friendship.getAddressee().getId().equals(userId) &&
+                friendship.getStatus() == Friendship.FriendshipStatus.REQUEST) {
+            friendship.setStatus(Friendship.FriendshipStatus.ACCEPTED);
+            return repository.save(friendship);
+        }
+        return friendship;
     }
 
     @Override
@@ -50,7 +63,7 @@ public class FriendshipServiceImpl implements FriendshipService {
     @Override
     public List<UserModel> getAllUserRequests(Long userId, int size, int page) {
         return repository.findAsRequester(userId, Friendship.FriendshipStatus.REQUEST, Pageable.ofSize(size).withPage(page))
-                .stream().map(Friendship::getRequester).collect(Collectors.toList());
+                .stream().map(Friendship::getAddressee).collect(Collectors.toList());
     }
 
     @Override
