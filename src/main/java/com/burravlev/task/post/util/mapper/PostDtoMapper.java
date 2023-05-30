@@ -22,7 +22,7 @@ public class PostDtoMapper implements Mapper<PostModel, PostDto> {
                 .ownerId(postModel.getCreator().getId())
                 .header(postModel.getHeader())
                 .message(postModel.getMessage())
-                .content(postModel.getContent().stream().map(ImageEntity::getId)
+                .content(postModel.getContent().stream().map(ImageEntity::getUrl)
                         .collect(Collectors.toList()))
                 .created(postModel.getCreated())
                 .build();

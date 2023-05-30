@@ -12,7 +12,7 @@ public class ImageDtoMapper implements Mapper<ImageEntity, ImageModel> {
     public ImageModel map(ImageEntity image) {
         return ImageModel.builder()
                 .id(image.getId())
-                .filename(image.getFilename())
+                .url(image.getUrl())
                 .contentType(image.getType().getType())
                 .build();
     }

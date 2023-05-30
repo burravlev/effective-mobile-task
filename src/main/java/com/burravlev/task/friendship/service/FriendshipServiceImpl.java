@@ -1,6 +1,7 @@
 package com.burravlev.task.friendship.service;
 
 import com.burravlev.task.friendship.domain.entity.Friendship;
+import com.burravlev.task.friendship.domain.model.FriendDeleteRequest;
 import com.burravlev.task.friendship.domain.model.FriendshipRequest;
 import com.burravlev.task.user.domain.entity.UserEntity;
 import com.burravlev.task.friendship.exception.IllegalFriendshipException;
@@ -117,5 +118,24 @@ public class FriendshipServiceImpl implements FriendshipService {
                         return f.getRequester().getId();
                     else return f.getAddressee().getId();
                 }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Friendship delete(Long id, FriendDeleteRequest request) {
+        Friendship friendship = find(id, request.getUserId());
+        if (friendship.getStatus() == Friendship.FriendshipStatus.REQUEST)
+            if (friendship.getRequester().getId().equals(id)) {
+                repository.delete(friendship);
+                friendship.setId(null);
+                return friendship;
+            } else {
+                throw new IllegalFriendshipException("Users are not friends");
+            }
+
+        friendship.setAddressee(userService.findById(id));
+        friendship.setRequester(userService.findById(request.getUserId()));
+        friendship.setStatus(Friendship.FriendshipStatus.REQUEST);
+
+        return repository.save(friendship);
     }
 }

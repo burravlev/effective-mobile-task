@@ -1,9 +1,13 @@
 package com.burravlev.task.post.service;
 
+import com.burravlev.task.auth.exception.UnauthorizedException;
+import com.burravlev.task.exception.NotFoundException;
 import com.burravlev.task.files.service.ImageStorageService;
 import com.burravlev.task.friendship.service.FriendshipService;
 import com.burravlev.task.post.domain.entity.PostModel;
 import com.burravlev.task.post.domain.model.PostCreationRequest;
+import com.burravlev.task.post.domain.model.PostDeleteRequest;
+import com.burravlev.task.post.domain.model.PostUpdateRequest;
 import com.burravlev.task.post.repository.PostRepository;
 import com.burravlev.task.user.domain.entity.UserEntity;
 import com.burravlev.task.user.service.UserService;
@@ -46,5 +50,31 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostModel> getAllUserPosts(Long userId, int size, int page) {
         return repository.findAllUserPosts(userId, PageRequest.of(page, size));
+    }
+
+    public PostModel find(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Post doesn't exists ID: " + id));
+    }
+
+    @Override
+    public PostModel update(Long userId, PostUpdateRequest request) {
+        PostModel post = find(request.getId());
+        if (!post.getCreator().getId().equals(userId))
+            throw new UnauthorizedException("No permission to delete this post");
+
+        post.setContent(imageService.findAll(request.getContent()));
+        post.setHeader(request.getHeader());
+        post.setMessage(request.getMessage());
+        return repository.save(post);
+    }
+
+    @Override
+    public PostModel delete(Long userId, PostDeleteRequest request) {
+        PostModel post = find(request.getPostId());
+        if (!post.getCreator().getId().equals(userId))
+            throw new UnauthorizedException("No permission to delete this post");
+        repository.delete(post);
+        return post;
     }
 }

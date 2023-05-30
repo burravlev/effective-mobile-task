@@ -14,7 +14,7 @@ public class ImageEntity     {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String filename;
+    private String url;
     @Enumerated(EnumType.STRING)
     private ImageType type;
 

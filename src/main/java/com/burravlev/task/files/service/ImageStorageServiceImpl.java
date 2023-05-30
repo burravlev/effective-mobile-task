@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
@@ -25,6 +26,8 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     @Value("${application.files.dir}")
     private String outputDir;
     private Path root;
+    @Value("${application.files.image.uri}")
+    private String imageUri;
 
     @PostConstruct
     public void init() throws Exception {
@@ -46,7 +49,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
             try {
                 String name = UUID.randomUUID().toString();
                 Files.copy(file.getInputStream(), this.root.resolve(name + image.getType().getExtension()));
-                image.setFilename(name);
+                image.setUrl(imageUri + name + image.getType().getExtension());
                 images.add(image);
             } catch (Exception e) {
 
@@ -71,6 +74,12 @@ public class ImageStorageServiceImpl implements ImageStorageService {
             System.out.println(e.getClass());
             throw new FileProcessingException("Internal server error while processing image");
         }
+    }
+
+    @Override
+    @Transactional
+    public List<ImageEntity> findAllInUrls(List<String> urls) {
+        return repository.findAllInUrls(urls);
     }
 
     @Override

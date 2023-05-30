@@ -10,4 +10,7 @@ import java.util.List;
 public interface ImagesRepository extends JpaRepository<ImageEntity, Long> {
     @Query("FROM ImageEntity i WHERE i.id IN :ids")
     List<ImageEntity> findAll(@Param("ids") List<Long> ids);
+
+    @Query("FROM ImageEntity i WHERE i.url IN :urls")
+    List<ImageEntity> findAllInUrls(@Param("urls") List<String> urls);
 }

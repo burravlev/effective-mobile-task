@@ -26,9 +26,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String extractUsername(String token) {
-        String username = extractClaim(token, Claims::getSubject);
-        System.out.println(username);
-        return username;
+        return extractClaim(token, Claims::getSubject);
     }
 
     @Override

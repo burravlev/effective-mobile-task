@@ -25,12 +25,12 @@ public class UserController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Get user by id",
-                    content = @Content(schema = @Schema(implementation = UserModel.class))),
+                    content = @Content(schema = @Schema(implementation = UserModel.class),
+                    mediaType = "application/json")),
             @ApiResponse(responseCode = "404", description = "User not found",
-                    content = @Content(schema = @Schema(implementation = ErrorDto.class))),
-            @ApiResponse(responseCode = "403", description = "Not authenticated",
-                    content = @Content(schema = @Schema(implementation = ErrorDto.class))),
-    })
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class),
+                    mediaType = "application/json")),
+            })
     @GetMapping("/{id}")
     public ResponseEntity<UserModel> get(@PathVariable("id") Long id) {
         UserModel user = mapper.map(userService.findById(id));

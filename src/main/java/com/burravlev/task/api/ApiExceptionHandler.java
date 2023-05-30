@@ -2,6 +2,7 @@ package com.burravlev.task.api;
 
 import com.burravlev.task.api.dto.ErrorDto;
 import com.burravlev.task.exception.NotFoundException;
+import com.burravlev.task.exception.UnauthenticatedException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -38,5 +39,10 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorDto> handleNotFoundException(Exception e) {
         String message = e.getMessage();
         return new ResponseEntity<>(new ErrorDto(message), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UnauthenticatedException.class)
+    public ResponseEntity<ErrorDto> handleUnauthenticatedException(UnauthenticatedException e) {
+        return new ResponseEntity<>(new ErrorDto(e.getMessage()), HttpStatus.NOT_FOUND);
     }
 }

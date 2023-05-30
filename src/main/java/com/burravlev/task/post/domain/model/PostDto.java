@@ -26,7 +26,7 @@ public class PostDto {
     private String message;
     @Schema(name = "content", example = "My cat photo", description = "ID to media content", type = "long")
     @JsonProperty("content")
-    private List<Long> content;
+    private List<String> content;
     @Schema(name = "created", description = "Created date")
     @JsonProperty("created")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")

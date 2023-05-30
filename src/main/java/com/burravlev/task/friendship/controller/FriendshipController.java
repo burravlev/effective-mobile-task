@@ -10,6 +10,8 @@ import com.burravlev.task.user.domain.entity.UserEntity;
 import com.burravlev.task.friendship.service.FriendshipService;
 import com.burravlev.task.util.mapper.Mapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,32 +36,36 @@ public class FriendshipController {
     private final Mapper<UserEntity, UserModel> mapper;
 
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get all user friends.",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserModel.class)),
+                            mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class),
+                            mediaType = "application/json"))
+
     })
-    @Operation(method = "POST", description = "Get user friend list")
+    @Operation(method = "GET", description = "Get user friends list")
     @GetMapping("/users/{id}/friends")
     public ResponseEntity<List<?>> findAllUserFriends(
             @PathVariable("id") Long id,
-            @RequestParam("size") Integer size,
-            @RequestParam("page") Integer page)
-    {
+            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
         List<UserModel> users = friendshipService.getAllFriends(id, size, page)
                 .stream().map(mapper::map).collect(Collectors.toList());
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @Operation(method = "POST", description = "Approves or creates a friend request.",
-            security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Friendship request created or approved",
+            @ApiResponse(responseCode = "200", description = "Creates or approves friendship request",
                     content = @Content(schema = @Schema(implementation = SuccessDto.class),
-                            mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "Bad request",
-                    content = @Content(schema = @Schema(implementation = ErrorDto.class),
                             mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Unauthorized request",
                     content = @Content(schema = @Schema(implementation = ErrorDto.class),
                             mediaType = "application/json"))
     })
+    @Operation(method = "POST", description = "Approves or creates a friend request.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @PostMapping("/me/friends")
     public ResponseEntity<SuccessDto> acceptOrNewRequest(Authentication auth, @RequestBody FriendshipRequest request) {
         Long userId = Long.parseLong(auth.getName());
@@ -73,16 +79,48 @@ public class FriendshipController {
         return new ResponseEntity<>(successDto, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/me/friends")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Delete user from friends or unsubscribe from user.",
+                    content = @Content(schema = @Schema(implementation = SuccessDto.class),
+                            mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class),
+                            mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Unauthorized request",
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class),
+                            mediaType = "application/json"))
+    })
     @Operation(method = "DELETE", description = "Removes the user from the friends list or rejects the friend request.",
             security = @SecurityRequirement(name = "bearerAuth"))
+    @DeleteMapping("/me/friends")
     public ResponseEntity<?> deleteOrReject(Authentication auth, @RequestBody FriendDeleteRequest request) {
-        return null;
+        final Long userId = Long.parseLong(auth.getName());
+        Friendship friendship = friendshipService.delete(userId, request);
+        final SuccessDto response;
+        if (friendship.getId() != null)
+            response = new SuccessDto("User: " + request.getUserId() + " successfully deleted from friends");
+        else
+            response = new SuccessDto("Unsubscribed from user: " + request.getUserId());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get all user friends.",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserModel.class)),
+                            mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class),
+                            mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Unauthorized request",
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class),
+                            mediaType = "application/json"))
+    })
+    @Operation(method = "GET", description = "Get authenticated user's friends list",
+            security = @SecurityRequirement(name = "bearerAuth"),
+            parameters = {
+                    @Parameter(name = "size", allowEmptyValue = true, description = "Controls friends list size"),
+                    @Parameter(name = "page", description = "Controls response page", allowEmptyValue = true)})
     @GetMapping("/me/friends")
-    @Operation(method = "GET", description = "Get user's friends list",
-            security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<List<?>> findAllUserFriends(
             Authentication auth,
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
@@ -92,12 +130,26 @@ public class FriendshipController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get all user requests.",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserModel.class)),
+                            mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class),
+                            mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Unauthorized request",
+                    content = @Content(schema = @Schema(),
+                            mediaType = "application/json"))
+    })
+    @Operation(method = "GET", description = "Get authenticated user's friendship requests",
+            security = @SecurityRequirement(name = "bearerAuth"),
+            parameters = {
+                    @Parameter(name = "size", allowEmptyValue = true, description = "Controls friends list size"),
+                    @Parameter(name = "page", description = "Controls response page", allowEmptyValue = true)})
     @GetMapping("/me/friends/requests")
-    @Operation(method = "GET", description = "Get user's friendship requests",
-            security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<List<?>> getAllUserRequests(
             Authentication auth,
-            @RequestParam(value = "size",required = false, defaultValue = "10") Integer size,
+            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page
     ) {
         List<UserModel> users = friendshipService.getAllUserRequests(Long.parseLong(auth.getName()), size, page)
@@ -105,12 +157,26 @@ public class FriendshipController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping("/me/friends/subscribers")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get all user subscribers.",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserModel.class)),
+                            mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class),
+                            mediaType = "application/json")),
+            @ApiResponse(responseCode = "403", description = "Unauthorized request",
+                    content = @Content(schema = @Schema(implementation = ErrorDto.class),
+                            mediaType = "application/json"))
+    })
     @Operation(method = "GET", description = "Get user's subscribers list",
-            security = @SecurityRequirement(name = "bearerAuth"))
+            security = @SecurityRequirement(name = "bearerAuth"),
+            parameters = {
+                    @Parameter(name = "size", allowEmptyValue = true, description = "Controls friends list size"),
+                    @Parameter(name = "page", description = "Controls response page", allowEmptyValue = true)})
+    @GetMapping("/me/friends/subscribers")
     public ResponseEntity<List<?>> getAllUserSubscribers(
             Authentication auth,
-            @RequestParam(value = "size",required = false, defaultValue = "10") Integer size,
+            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page
     ) {
         List<UserModel> users = friendshipService.getAllUserSubscribers(Long.parseLong(auth.getName()), size, page)

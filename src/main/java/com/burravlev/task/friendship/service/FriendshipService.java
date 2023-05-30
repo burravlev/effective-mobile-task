@@ -1,5 +1,6 @@
 package com.burravlev.task.friendship.service;
 
+import com.burravlev.task.friendship.domain.model.FriendDeleteRequest;
 import com.burravlev.task.friendship.domain.model.FriendshipRequest;
 import com.burravlev.task.friendship.domain.entity.Friendship;
 import com.burravlev.task.user.domain.entity.UserEntity;
@@ -26,4 +27,6 @@ public interface FriendshipService {
     Friendship unsubscribe(Long userId, Long unsubscribeFromId);
 
     List<Long> getAllFollowedUsers(Long id);
+
+    Friendship delete(Long id, FriendDeleteRequest request);
 }
