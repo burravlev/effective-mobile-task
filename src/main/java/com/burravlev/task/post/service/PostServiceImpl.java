@@ -4,7 +4,7 @@ import com.burravlev.task.auth.exception.UnauthorizedException;
 import com.burravlev.task.exception.NotFoundException;
 import com.burravlev.task.files.service.ImageStorageService;
 import com.burravlev.task.friendship.service.FriendshipService;
-import com.burravlev.task.post.domain.entity.PostModel;
+import com.burravlev.task.post.domain.entity.PostEntity;
 import com.burravlev.task.post.domain.model.PostCreationRequest;
 import com.burravlev.task.post.domain.model.PostDeleteRequest;
 import com.burravlev.task.post.domain.model.PostUpdateRequest;
@@ -29,15 +29,15 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public Page<PostModel> getPostsFromFollowedUsers(Long userId, int size, int page) {
+    public Page<PostEntity> getPostsFromFollowedUsers(Long userId, int size, int page) {
         List<Long> followerUsersIds = friendshipService.getAllFollowedUsers(userId);
         return repository.findAllUsersPosts(followerUsersIds, PageRequest.of(page, size));
     }
 
     @Override
-    public PostModel createNewPost(Long userId, PostCreationRequest request) {
+    public PostEntity createNewPost(Long userId, PostCreationRequest request) {
         UserEntity user = userService.findById(userId);
-        PostModel post = PostModel.builder()
+        PostEntity post = PostEntity.builder()
                 .creator(user)
                 .created(LocalDateTime.now())
                 .header(request.getHeader())
@@ -48,18 +48,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<PostModel> getAllUserPosts(Long userId, int size, int page) {
+    public Page<PostEntity> getAllUserPosts(Long userId, int size, int page) {
         return repository.findAllUserPosts(userId, PageRequest.of(page, size));
     }
 
-    public PostModel find(Long id) {
+    public PostEntity find(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Post doesn't exists ID: " + id));
     }
 
     @Override
-    public PostModel update(Long userId, PostUpdateRequest request) {
-        PostModel post = find(request.getId());
+    public PostEntity update(Long userId, PostUpdateRequest request) {
+        PostEntity post = find(request.getId());
         if (!post.getCreator().getId().equals(userId))
             throw new UnauthorizedException("No permission to delete this post");
 
@@ -70,8 +70,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostModel delete(Long userId, PostDeleteRequest request) {
-        PostModel post = find(request.getPostId());
+    public PostEntity delete(Long userId, PostDeleteRequest request) {
+        PostEntity post = find(request.getPostId());
         if (!post.getCreator().getId().equals(userId))
             throw new UnauthorizedException("No permission to delete this post");
         repository.delete(post);

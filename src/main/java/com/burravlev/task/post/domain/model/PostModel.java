@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostDto {
+public class PostModel {
     @Schema(name = "id", example = "1", description = "Post id")
     private Long id;
     @Schema(name = "owner_id",

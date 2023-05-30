@@ -2,10 +2,10 @@ package com.burravlev.task.post.controller;
 
 import com.burravlev.task.api.dto.ErrorDto;
 import com.burravlev.task.exception.UnauthenticatedException;
-import com.burravlev.task.post.domain.entity.PostModel;
+import com.burravlev.task.post.domain.entity.PostEntity;
 import com.burravlev.task.post.domain.model.PostCreationRequest;
 import com.burravlev.task.post.domain.model.PostDeleteRequest;
-import com.burravlev.task.post.domain.model.PostDto;
+import com.burravlev.task.post.domain.model.PostModel;
 import com.burravlev.task.post.domain.model.PostUpdateRequest;
 import com.burravlev.task.post.service.PostService;
 import com.burravlev.task.util.mapper.Mapper;
@@ -34,12 +34,12 @@ import java.util.stream.Collectors;
 @Tag(name = "Posts API")
 public class PostController {
     private final PostService postService;
-    private final Mapper<PostModel, PostDto> mapper;
+    private final Mapper<PostEntity, PostModel> mapper;
 
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Get all followed users' posts.",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDto.class)),
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostModel.class)),
                             mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Unauthenticated request")
     })
@@ -49,18 +49,18 @@ public class PostController {
                     @Parameter(name = "size", allowEmptyValue = true, description = "Controls friends list size"),
                     @Parameter(name = "page", description = "Controls response page", allowEmptyValue = true)})
     @GetMapping("/users/{id}/posts")
-    public ResponseEntity<List<PostDto>> getUserPosts(
+    public ResponseEntity<List<PostModel>> getUserPosts(
             @PathVariable("id") Long id,
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
-        List<PostDto> posts = postService.getAllUserPosts(id, size, page)
+        List<PostModel> posts = postService.getAllUserPosts(id, size, page)
                 .stream().map(mapper::map).collect(Collectors.toList());
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Get all user's posts.",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDto.class)),
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostModel.class)),
                             mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Unauthenticated request",
                     content = @Content(schema = @Schema(implementation = ErrorDto.class)))
@@ -71,35 +71,35 @@ public class PostController {
                     @Parameter(name = "size", allowEmptyValue = true, description = "Controls friends list size"),
                     @Parameter(name = "page", description = "Controls response page", allowEmptyValue = true)})
     @GetMapping("/me/posts")
-    public ResponseEntity<List<PostDto>> getUserPersonalPosts(
+    public ResponseEntity<List<PostModel>> getUserPersonalPosts(
             Authentication auth,
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
         if (auth == null) throw new UnauthenticatedException("User is unauthenticated");
         final Long userId = Long.parseLong(auth.getName());
-        List<PostDto> posts = postService.getAllUserPosts(userId, size, page)
+        List<PostModel> posts = postService.getAllUserPosts(userId, size, page)
                 .stream().map(mapper::map).collect(Collectors.toList());
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "New post created",
-                    content = @Content(schema = @Schema(implementation = PostDto.class),
+                    content = @Content(schema = @Schema(implementation = PostModel.class),
                             mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Not authenticated request")
     })
     @Operation(method = "GET", description = "Used to create new post",
             security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/me/posts")
-    public ResponseEntity<PostDto> createNewPost(Authentication auth, @RequestBody PostCreationRequest request) {
+    public ResponseEntity<PostModel> createNewPost(Authentication auth, @RequestBody PostCreationRequest request) {
         final Long userId = Long.parseLong(auth.getName());
-        PostModel post = postService.createNewPost(userId, request);
+        PostEntity post = postService.createNewPost(userId, request);
         return new ResponseEntity<>(mapper.map(post), HttpStatus.CREATED);
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Get all followed users' posts.",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDto.class)),
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostModel.class)),
                             mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "Unauthenticated request")
     })
@@ -109,12 +109,12 @@ public class PostController {
                     @Parameter(name = "size", allowEmptyValue = true, description = "Controls friends list size"),
                     @Parameter(name = "page", description = "Controls response page", allowEmptyValue = true)})
     @GetMapping("/feed")
-    public ResponseEntity<List<PostDto>> getAllPosts(
+    public ResponseEntity<List<PostModel>> getAllPosts(
             Authentication auth,
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
         final Long userId = Long.parseLong(auth.getName());
-        Page<PostModel> posts = postService.getPostsFromFollowedUsers(userId, size, page);
+        Page<PostEntity> posts = postService.getPostsFromFollowedUsers(userId, size, page);
 
         return new ResponseEntity<>(posts.stream().map(mapper::map)
                 .collect(Collectors.toList()), HttpStatus.OK);
@@ -122,7 +122,7 @@ public class PostController {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Post updated",
-                    content = @Content(schema = @Schema(implementation = PostDto.class),
+                    content = @Content(schema = @Schema(implementation = PostModel.class),
                             mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "No permission to update this post",
                     content = @Content(schema = @Schema(implementation = ErrorDto.class)))
@@ -130,15 +130,15 @@ public class PostController {
     @Operation(method = "GET", description = "Used to create new post",
             security = @SecurityRequirement(name = "bearerAuth"))
     @PutMapping("/me/posts")
-    public ResponseEntity<PostDto> update(Authentication auth, @RequestBody PostUpdateRequest request) {
+    public ResponseEntity<PostModel> update(Authentication auth, @RequestBody PostUpdateRequest request) {
         final Long userId = Long.parseLong(auth.getName());
-        PostDto post = mapper.map(postService.update(userId, request));
+        PostModel post = mapper.map(postService.update(userId, request));
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Post deleted",
-                    content = @Content(schema = @Schema(implementation = PostDto.class),
+                    content = @Content(schema = @Schema(implementation = PostModel.class),
                             mediaType = "application/json")),
             @ApiResponse(responseCode = "403", description = "No permission to update this post",
                     content = @Content(schema = @Schema(implementation = ErrorDto.class)))
@@ -146,9 +146,9 @@ public class PostController {
     @Operation(method = "GET", description = "Used to create new post",
             security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping("/me/posts")
-    public ResponseEntity<PostDto> delete(Authentication auth, @RequestBody PostDeleteRequest request) {
+    public ResponseEntity<PostModel> delete(Authentication auth, @RequestBody PostDeleteRequest request) {
         final Long userId = Long.parseLong(auth.getName());
-        PostDto post = mapper.map(postService.delete(userId, request));
+        PostModel post = mapper.map(postService.delete(userId, request));
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 }
