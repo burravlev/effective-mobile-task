@@ -1,5 +1,6 @@
 package com.burravlev.task.post.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -15,10 +16,10 @@ import java.util.List;
 public class PostDto {
     @Schema(name = "id", example = "1", description = "Post id")
     private Long id;
-    @Schema(name = "created_by",
+    @Schema(name = "owner_id",
     description = "User id", type = "long", example = "12344")
-    @JsonProperty("created_by")
-    private Long createdBy;
+    @JsonProperty("owner_id")
+    private Long ownerId;
     @Schema(name = "header", description = "My cat photo")
     private String header;
     @Schema(name = "message", example = "So beautiful", description = "Post text")
@@ -28,5 +29,6 @@ public class PostDto {
     private List<Long> content;
     @Schema(name = "created", description = "Created date")
     @JsonProperty("created")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
 }

@@ -5,13 +5,12 @@ import com.burravlev.task.friendship.service.FriendshipService;
 import com.burravlev.task.post.domain.entity.PostModel;
 import com.burravlev.task.post.domain.model.PostCreationRequest;
 import com.burravlev.task.post.repository.PostRepository;
-import com.burravlev.task.user.domain.model.UserModel;
+import com.burravlev.task.user.domain.entity.UserEntity;
 import com.burravlev.task.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,7 +32,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostModel createNewPost(Long userId, PostCreationRequest request) {
-        UserModel user = userService.findById(userId);
+        UserEntity user = userService.findById(userId);
         PostModel post = PostModel.builder()
                 .creator(user)
                 .created(LocalDateTime.now())
@@ -44,4 +43,8 @@ public class PostServiceImpl implements PostService {
         return repository.save(post);
     }
 
+    @Override
+    public Page<PostModel> getAllUserPosts(Long userId, int size, int page) {
+        return repository.findAllUserPosts(userId, PageRequest.of(page, size));
+    }
 }

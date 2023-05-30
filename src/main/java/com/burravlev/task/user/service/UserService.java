@@ -1,21 +1,21 @@
 package com.burravlev.task.user.service;
 
-import com.burravlev.task.user.domain.dto.PasswordUpdateRequest;
-import com.burravlev.task.user.domain.dto.UserInfoUpdateRequest;
-import com.burravlev.task.user.domain.model.UserModel;
+import com.burravlev.task.user.domain.model.PasswordUpdateRequest;
+import com.burravlev.task.user.domain.model.UserInfoUpdateRequest;
+import com.burravlev.task.user.domain.entity.UserEntity;
 
 public interface UserService {
-    UserModel findById(Long id);
+    UserEntity findById(Long id);
 
-    UserModel findByEmail(String email);
+    UserEntity findByEmail(String email);
 
-    UserModel findBySub(String sub);
+    UserEntity findBySub(String sub);
 
-    UserModel findByUsername(String username);
+    UserEntity findByUsername(String username);
 
-    UserModel save(UserModel user);
+    UserEntity save(UserEntity user);
 
-    UserModel update(Long id, UserInfoUpdateRequest request);
+    UserEntity update(Long id, UserInfoUpdateRequest request);
 
-    UserModel updatePassword(Long id, PasswordUpdateRequest request);
+    UserEntity updatePassword(Long id, PasswordUpdateRequest request);
 }

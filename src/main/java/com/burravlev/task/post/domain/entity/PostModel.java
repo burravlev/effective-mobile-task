@@ -1,7 +1,7 @@
 package com.burravlev.task.post.domain.entity;
 
-import com.burravlev.task.files.domain.entity.Image;
-import com.burravlev.task.user.domain.model.UserModel;
+import com.burravlev.task.files.domain.entity.ImageEntity;
+import com.burravlev.task.user.domain.entity.UserEntity;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -21,7 +21,7 @@ public class PostModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    private UserModel creator;
+    private UserEntity creator;
     private String header;
     private String message;
     @ManyToMany(fetch = FetchType.EAGER)
@@ -30,11 +30,11 @@ public class PostModel {
             joinColumns = @JoinColumn(name = "image_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id")
     )
-    private List<Image> content = new ArrayList<>();
+    private List<ImageEntity> content = new ArrayList<>();
     @CreatedDate
     private LocalDateTime created;
 
-    public void addImage(Image image) {
+    public void addImage(ImageEntity image) {
         this.content.add(image);
     }
 }

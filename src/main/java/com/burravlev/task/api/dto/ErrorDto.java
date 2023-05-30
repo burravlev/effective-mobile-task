@@ -6,11 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorDto {
-    @Schema(name = "error", description = "Contains error message", example = "Entity not found")
-    private String error;
+    @Schema(name = "error", description = "Contains error messages", example = "[Entity not found]")
+    private List<String> error = new ArrayList<>();
+
+    public ErrorDto(String message) {
+        this.error.add(message);
+    }
 }

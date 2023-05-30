@@ -1,4 +1,4 @@
-package com.burravlev.task.user.domain.model;
+package com.burravlev.task.user.domain.entity;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 

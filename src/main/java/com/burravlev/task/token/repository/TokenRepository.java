@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface TokenRepository extends JpaRepository<Token, Long> {
 
-    @Query("SELECT t FROM Token t INNER JOIN UserModel u ON t.user.id = u.id WHERE u.id = :id AND (t.expired = false OR t.revoked = false)")
+    @Query("SELECT t FROM Token t INNER JOIN UserEntity u ON t.user.id = u.id WHERE u.id = :id AND (t.expired = false OR t.revoked = false)")
     List<Token> findAllValidTokens(Long id);
 
     Optional<Token> findByToken(String token);

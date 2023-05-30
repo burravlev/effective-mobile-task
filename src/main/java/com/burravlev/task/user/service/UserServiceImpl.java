@@ -1,12 +1,13 @@
 package com.burravlev.task.user.service;
 
 import com.burravlev.task.auth.exception.WrongCredentialsException;
-import com.burravlev.task.user.domain.dto.PasswordUpdateRequest;
-import com.burravlev.task.user.domain.dto.UserInfoUpdateRequest;
+import com.burravlev.task.exception.NotFoundException;
+import com.burravlev.task.user.domain.model.PasswordUpdateRequest;
+import com.burravlev.task.user.domain.model.UserInfoUpdateRequest;
 import com.burravlev.task.user.exception.EmailIsAlreadyTakenException;
 import com.burravlev.task.user.exception.UserNotFoundException;
 import com.burravlev.task.user.exception.UsernameIsAlreadyTakenException;
-import com.burravlev.task.user.domain.model.UserModel;
+import com.burravlev.task.user.domain.entity.UserEntity;
 import com.burravlev.task.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,26 +22,26 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserModel findByEmail(String email) {
+    public UserEntity findByEmail(String email) {
         return repository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException("User with email: " + email + " not found"));
     }
 
     @Override
-    public UserModel findBySub(String sub) {
+    public UserEntity findBySub(String sub) {
         return repository.findById(Long.parseLong(sub))
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException("User: " + sub + " not found"));
     }
 
     @Override
-    public UserModel findByUsername(String username) {
+    public UserEntity findByUsername(String username) {
         return repository.findByPublicUsername(username)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException("User: " + username + " not found"));
     }
 
     @Override
     @Transactional
-    public UserModel save(UserModel user) {
+    public UserEntity save(UserEntity user) {
         if (repository.existsByEmail(user.getEmail()))
             throw new EmailIsAlreadyTakenException("This email already registered");
         if (repository.existsByPublicUsername(user.getPublicUsername()))
@@ -49,14 +50,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModel findById(Long id) {
+    public UserEntity findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
-    public UserModel update(Long id, UserInfoUpdateRequest request) {
-        UserModel user = this.findById(id);
+    public UserEntity update(Long id, UserInfoUpdateRequest request) {
+        UserEntity user = this.findById(id);
         if (request.getUsername() != null)
             user.setPublicUsername(request.getUsername());
         if (request.getEmail() != null)
@@ -71,8 +72,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserModel updatePassword(Long id, PasswordUpdateRequest request) {
-        UserModel user = findById(id);
+    public UserEntity updatePassword(Long id, PasswordUpdateRequest request) {
+        UserEntity user = findById(id);
         System.out.println(request.getOldPassword());
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword()))
             throw new WrongCredentialsException("Old password doesn't match");

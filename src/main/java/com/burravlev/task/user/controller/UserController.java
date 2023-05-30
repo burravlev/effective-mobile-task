@@ -1,8 +1,8 @@
 package com.burravlev.task.user.controller;
 
 import com.burravlev.task.api.dto.ErrorDto;
-import com.burravlev.task.user.domain.dto.UserDto;
 import com.burravlev.task.user.domain.model.UserModel;
+import com.burravlev.task.user.domain.entity.UserEntity;
 import com.burravlev.task.user.service.UserService;
 import com.burravlev.task.util.mapper.Mapper;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,19 +21,19 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Users API", description = "Methods for working with users")
 public class UserController {
     private final UserService userService;
-    private final Mapper<UserModel, UserDto> mapper;
+    private final Mapper<UserEntity, UserModel> mapper;
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Get user by id",
-                    content = @Content(schema = @Schema(implementation = UserDto.class))),
+                    content = @Content(schema = @Schema(implementation = UserModel.class))),
             @ApiResponse(responseCode = "404", description = "User not found",
                     content = @Content(schema = @Schema(implementation = ErrorDto.class))),
             @ApiResponse(responseCode = "403", description = "Not authenticated",
                     content = @Content(schema = @Schema(implementation = ErrorDto.class))),
     })
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> get(@PathVariable("id") Long id) {
-        UserDto user = mapper.map(userService.findById(id));
+    public ResponseEntity<UserModel> get(@PathVariable("id") Long id) {
+        UserModel user = mapper.map(userService.findById(id));
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 }

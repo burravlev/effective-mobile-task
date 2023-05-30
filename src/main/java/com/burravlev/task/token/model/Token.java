@@ -1,6 +1,6 @@
 package com.burravlev.task.token.model;
 
-import com.burravlev.task.user.domain.model.UserModel;
+import com.burravlev.task.user.domain.entity.UserEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -24,5 +24,5 @@ public class Token {
     private boolean expired;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private UserModel user;
+    private UserEntity user;
 }

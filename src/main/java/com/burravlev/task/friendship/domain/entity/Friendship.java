@@ -1,8 +1,7 @@
 package com.burravlev.task.friendship.domain.entity;
 
-import com.burravlev.task.user.domain.model.UserModel;
+import com.burravlev.task.user.domain.entity.UserEntity;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,10 +20,10 @@ public class Friendship {
     private LocalDateTime created = LocalDateTime.now();
     @ManyToOne
     @JoinColumn(name = "requester_id", referencedColumnName = "id")
-    private UserModel requester;
+    private UserEntity requester;
     @ManyToOne
     @JoinColumn(name = "addressee_id", referencedColumnName = "id")
-    private UserModel addressee;
+    private UserEntity addressee;
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private FriendshipStatus status = FriendshipStatus.REQUEST;

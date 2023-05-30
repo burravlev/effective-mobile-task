@@ -29,7 +29,9 @@ public class PostController {
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page)
     {
-        return null;
+        List<PostDto> posts = postService.getAllUserPosts(id, size, page)
+                .stream().map(mapper::map).collect(Collectors.toList());
+        return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
     @PostMapping("/me/posts")

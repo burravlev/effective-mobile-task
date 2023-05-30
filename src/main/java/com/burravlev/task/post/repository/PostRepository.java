@@ -12,4 +12,7 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<PostModel, Long> {
     @Query("FROM PostModel p WHERE p.creator.id IN :users ORDER BY p.created")
     Page<PostModel> findAllUsersPosts(@Param("users") List<Long> users, Pageable pageable);
+
+    @Query("FROM PostModel p WHERE p.creator.id = :userId")
+    Page<PostModel> findAllUserPosts(@Param("userId") Long userId, Pageable pageable);
 }

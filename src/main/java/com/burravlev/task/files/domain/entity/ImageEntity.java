@@ -10,7 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Image {
+public class ImageEntity     {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

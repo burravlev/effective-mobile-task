@@ -6,7 +6,7 @@ spring:
     password: root
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: false
     properties:
       hibernate:
@@ -25,4 +25,6 @@ application:
       expiration: 86400000
       refresh-token:
         expiration: 604800000
-
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

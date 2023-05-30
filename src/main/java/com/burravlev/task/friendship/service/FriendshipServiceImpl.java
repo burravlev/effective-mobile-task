@@ -2,7 +2,7 @@ package com.burravlev.task.friendship.service;
 
 import com.burravlev.task.friendship.domain.entity.Friendship;
 import com.burravlev.task.friendship.domain.model.FriendshipRequest;
-import com.burravlev.task.user.domain.model.UserModel;
+import com.burravlev.task.user.domain.entity.UserEntity;
 import com.burravlev.task.friendship.exception.IllegalFriendshipException;
 import com.burravlev.task.exception.NotFoundException;
 import com.burravlev.task.friendship.repository.FriendshipRepository;
@@ -62,19 +62,19 @@ public class FriendshipServiceImpl implements FriendshipService {
     }
 
     @Override
-    public List<UserModel> getAllUserRequests(Long userId, int size, int page) {
+    public List<UserEntity> getAllUserRequests(Long userId, int size, int page) {
         return repository.findAsRequester(userId, Friendship.FriendshipStatus.REQUEST, Pageable.ofSize(size).withPage(page))
                 .stream().map(Friendship::getAddressee).collect(Collectors.toList());
     }
 
     @Override
-    public List<UserModel> getAllUserSubscribers(Long userId, int size, int page) {
+    public List<UserEntity> getAllUserSubscribers(Long userId, int size, int page) {
         return repository.findAsAddressee(userId, Friendship.FriendshipStatus.REQUEST, Pageable.ofSize(size).withPage(page))
                 .stream().map(Friendship::getRequester).collect(Collectors.toList());
     }
 
     @Override
-    public List<UserModel> getAllFriends(Long id, int size, int page) {
+    public List<UserEntity> getAllFriends(Long id, int size, int page) {
         return repository.findAll(id, Friendship.FriendshipStatus.ACCEPTED, PageRequest.of(page, size))
                 .stream().map(f -> {
                     if (!f.getAddressee().getId().equals(id))
@@ -89,8 +89,8 @@ public class FriendshipServiceImpl implements FriendshipService {
         Friendship friendship = find(userId, userToDeleteId);
         if (friendship.getStatus() == Friendship.FriendshipStatus.REQUEST)
             throw new IllegalFriendshipException("Users are not friends");
-        UserModel user = userService.findById(userId);
-        UserModel userToDelete = userService.findById(userToDeleteId);
+        UserEntity user = userService.findById(userId);
+        UserEntity userToDelete = userService.findById(userToDeleteId);
 
         friendship.setAddressee(user);
         friendship.setRequester(userToDelete);

@@ -1,7 +1,7 @@
 package com.burravlev.task.files.service;
 
 import com.burravlev.task.exception.NotFoundException;
-import com.burravlev.task.files.domain.entity.Image;
+import com.burravlev.task.files.domain.entity.ImageEntity;
 import com.burravlev.task.files.exception.FileProcessingException;
 import com.burravlev.task.files.repository.ImagesRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +33,14 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     }
 
     @Override
-    public List<Image> save(List<MultipartFile> files) {
-        List<Image> images = new ArrayList<>();
+    public List<ImageEntity> save(List<MultipartFile> files) {
+        List<ImageEntity> images = new ArrayList<>();
         for (MultipartFile file : files) {
-            final Image image = new Image();
-            if (file.getContentType().equals(Image.ImageType.PNG.getType()))
-                image.setType(Image.ImageType.PNG);
-            else if (file.getContentType().equals(Image.ImageType.JPEG.getType()))
-                image.setType(Image.ImageType.JPEG);
+            final ImageEntity image = new ImageEntity();
+            if (file.getContentType().equals(ImageEntity.ImageType.PNG.getType()))
+                image.setType(ImageEntity.ImageType.PNG);
+            else if (file.getContentType().equals(ImageEntity.ImageType.JPEG.getType()))
+                image.setType(ImageEntity.ImageType.JPEG);
             else throw new IllegalArgumentException("Image should be only png or jpeg");
 
             try {
@@ -56,7 +56,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     }
 
     @Override
-    public Image getById(Long id) {
+    public ImageEntity getById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Image not found exception, image id: " + id));
     }
@@ -74,7 +74,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     }
 
     @Override
-    public List<Image> findAll(List<Long> ids) {
+    public List<ImageEntity> findAll(List<Long> ids) {
         return repository.findAll(ids);
     }
 }

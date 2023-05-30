@@ -1,19 +1,17 @@
 package com.burravlev.task.user.repository;
 
-import com.burravlev.task.user.domain.model.UserModel;
-import org.springframework.data.domain.Page;
+import com.burravlev.task.user.domain.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<UserModel, Long> {
-    Optional<UserModel> findByEmail(String email);
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+    Optional<UserEntity> findByEmail(String email);
 
     boolean existsByEmail(String email);
 
     boolean existsByPublicUsername(String username);
 
-    Optional<UserModel> findByPublicUsername(String username);
+    Optional<UserEntity> findByPublicUsername(String username);
 
 }

@@ -1,14 +1,14 @@
 package com.burravlev.task.auth.service;
 
-import com.burravlev.task.auth.dto.AuthenticationRequest;
-import com.burravlev.task.auth.dto.AuthenticationResponse;
-import com.burravlev.task.auth.dto.RegistrationRequest;
+import com.burravlev.task.auth.model.AuthenticationRequest;
+import com.burravlev.task.auth.model.AuthenticationResponse;
+import com.burravlev.task.auth.model.RegistrationRequest;
 import com.burravlev.task.auth.exception.WrongCredentialsException;
 import com.burravlev.task.jwt.service.JwtService;
 import com.burravlev.task.token.model.Token;
 import com.burravlev.task.token.model.TokenType;
 import com.burravlev.task.token.service.TokenService;
-import com.burravlev.task.user.domain.model.UserModel;
+import com.burravlev.task.user.domain.entity.UserEntity;
 import com.burravlev.task.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +34,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse register(RegistrationRequest request) {
-        UserModel user = UserModel.builder()
+        UserEntity user = UserEntity.builder()
                 .publicUsername(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
-        UserModel saved = userService.save(user);
+        UserEntity saved = userService.save(user);
         String token = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(saved, token);
@@ -51,13 +51,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        final UserModel user;
+        final UserEntity user;
 
         if (request.getUsername() != null)
             user = userService.findByUsername(request.getUsername());
         else if (request.getEmail() != null)
             user = userService.findByEmail(request.getEmail());
         else throw new WrongCredentialsException("User doesn't exists");
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword()))
+            throw new WrongCredentialsException("Wrong password");
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -77,7 +80,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
-    private void saveUserToken(UserModel user, String jwtToken) {
+    private void saveUserToken(UserEntity user, String jwtToken) {
         Token token = Token.builder()
                 .user(user)
                 .token(jwtToken)
@@ -97,7 +100,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         refreshToken = authHeader.substring(7);
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            UserModel user = userService.findByEmail(userEmail);
+            UserEntity user = userService.findByEmail(userEmail);
             if (jwtService.isTokenValid(refreshToken, user)) {
                 String accessToken = jwtService.generateToken(user);
                 revokeAllUserTokens(user);
@@ -111,7 +114,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    private void revokeAllUserTokens(UserModel user) {
+    private void revokeAllUserTokens(UserEntity user) {
         List<Token> validUserTokens = tokenService.findAllValidTokensByUserId(user.getId());
         if (validUserTokens.isEmpty()) return;
         validUserTokens.forEach(token -> {

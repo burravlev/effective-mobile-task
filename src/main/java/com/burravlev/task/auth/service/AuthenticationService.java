@@ -1,8 +1,8 @@
 package com.burravlev.task.auth.service;
 
-import com.burravlev.task.auth.dto.AuthenticationRequest;
-import com.burravlev.task.auth.dto.AuthenticationResponse;
-import com.burravlev.task.auth.dto.RegistrationRequest;
+import com.burravlev.task.auth.model.AuthenticationRequest;
+import com.burravlev.task.auth.model.AuthenticationResponse;
+import com.burravlev.task.auth.model.RegistrationRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

@@ -4,9 +4,9 @@ import com.burravlev.task.api.dto.ErrorDto;
 import com.burravlev.task.api.dto.SuccessDto;
 import com.burravlev.task.friendship.domain.model.FriendDeleteRequest;
 import com.burravlev.task.friendship.domain.model.FriendshipRequest;
-import com.burravlev.task.user.domain.dto.UserDto;
-import com.burravlev.task.friendship.domain.entity.Friendship;
 import com.burravlev.task.user.domain.model.UserModel;
+import com.burravlev.task.friendship.domain.entity.Friendship;
+import com.burravlev.task.user.domain.entity.UserEntity;
 import com.burravlev.task.friendship.service.FriendshipService;
 import com.burravlev.task.util.mapper.Mapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Tag(name = "Friends API", description = "Methods for working with friends")
 public class FriendshipController {
     private final FriendshipService friendshipService;
-    private final Mapper<UserModel, UserDto> mapper;
+    private final Mapper<UserEntity, UserModel> mapper;
 
     @ApiResponses(value = {
     })
@@ -42,7 +42,7 @@ public class FriendshipController {
             @RequestParam("size") Integer size,
             @RequestParam("page") Integer page)
     {
-        List<UserDto> users = friendshipService.getAllFriends(id, size, page)
+        List<UserModel> users = friendshipService.getAllFriends(id, size, page)
                 .stream().map(mapper::map).collect(Collectors.toList());
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
@@ -87,7 +87,7 @@ public class FriendshipController {
             Authentication auth,
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
-        List<UserDto> users = friendshipService.getAllFriends(Long.parseLong(auth.getName()), size, page)
+        List<UserModel> users = friendshipService.getAllFriends(Long.parseLong(auth.getName()), size, page)
                 .stream().map(mapper::map).collect(Collectors.toList());
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
@@ -100,7 +100,7 @@ public class FriendshipController {
             @RequestParam(value = "size",required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page
     ) {
-        List<UserDto> users = friendshipService.getAllUserRequests(Long.parseLong(auth.getName()), size, page)
+        List<UserModel> users = friendshipService.getAllUserRequests(Long.parseLong(auth.getName()), size, page)
                 .stream().map(mapper::map).collect(Collectors.toList());
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
@@ -113,7 +113,7 @@ public class FriendshipController {
             @RequestParam(value = "size",required = false, defaultValue = "10") Integer size,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page
     ) {
-        List<UserDto> users = friendshipService.getAllUserSubscribers(Long.parseLong(auth.getName()), size, page)
+        List<UserModel> users = friendshipService.getAllUserSubscribers(Long.parseLong(auth.getName()), size, page)
                 .stream().map(mapper::map).collect(Collectors.toList());
         return new ResponseEntity<>(users, HttpStatus.OK);
     }

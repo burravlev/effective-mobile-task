@@ -11,4 +11,6 @@ public interface PostService {
     Page<PostModel> getPostsFromFollowedUsers(Long userId, int size, int page);
 
     PostModel createNewPost(Long userId, PostCreationRequest request);
+
+    Page<PostModel> getAllUserPosts(Long userId, int size, int page);
 }
